@@ -9,7 +9,18 @@ type inode interface {
   entryAt (key IObj, hash, shift uint) *keyVal
   with (entry *keyVal, hash, shift uint) (inode, bool)
   without (key IObj, hash, shift uint) (inode, bool)
+  iter () iterator
 }
+
+type iterator interface {
+  hasNext() bool
+  next() *keyVal
+}
+
+type entryIterator struct {
+  nodeIterStack Stack
+}
+
 
 type hamtNode struct {
   index uint
@@ -247,7 +258,8 @@ func (node *hamtNode) without(key IObj, hash, shift uint) (inode, bool) {
   }
 }
 
-func (node *hamtNode) with(entry *keyVal, hash, shift uint) (inode, bool) {var idx, mask uint
+func (node *hamtNode) with(entry *keyVal, hash, shift uint) (inode, bool) {
+  var idx, mask uint
   idx = (hash >> shift) & 31
   mask = 1 << idx
   pos := ipopcount(node.index, idx)
