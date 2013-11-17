@@ -24,7 +24,7 @@ func ipopcount(x, offset uint) byte {
 func idxMask(hash, shift uint) (uint, uint) {
   var idx, mask uint
   idx = (hash >> shift) & 31
-  mask = 1 << idx
+  mask = 0x80000000 >> idx
   return idx, mask
 }
 

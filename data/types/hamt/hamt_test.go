@@ -137,5 +137,43 @@ func TestDistinguish (t *testing.T) {
   }
 }
 
+func TestPopcount (t *testing.T) {
+  var v1 uint = 1 // expect 1
+  var v2 uint = 65 // expect 2
+  var v3 uint = 0x10000000 // expect 1
+  var v4 uint = 0xFF000000 // expect 8
 
+  if popcount(v1) != 1 ||
+     popcount(v2) != 2 ||
+     popcount(v3) != 1 ||
+     popcount(v4) != 8 {
+      t.Log("popcount is doing weird stuff")
+      t.Fail()
+  }
+
+  var v5 uint = 0xFFFFFFFF
+  var i byte
+  for i=0;i<32;i++ {
+    if ipopcount(v5, uint(i)) != i {
+      t.Log("ipopcount is doing weird stuff")
+      t.Fail()
+    }
+  }
+}
+
+func TestIdxMask (t *testing.T) {
+  idx, mask := idxMask(0, 0)
+
+  if idx != 0 || mask != 0x80000000 {
+    t.Log("idxMask is doing weird stuff")
+    t.Fail()
+  }
+
+  idx, mask = idxMask(0x80000000, 30)
+
+  if idx != 2 || mask != 0x20000000 {
+    t.Log("idxMask is doing crazy weird stuff")
+    t.Fail()
+  }
+}
 
