@@ -1,6 +1,6 @@
 ## Clojang
 
-Clojang is an attempt to write a Clojure interpreter in Go. The word 'Clojang' is pronounced k-low-yang and is a bad portmanteau of 'Clojure' and 'golang' (the much-better 'gojure' is already taken, but the project seems inactive).
+Clojang is an attempt to write a Clojure interpreter in Go. The word 'Clojang' is pronounced k-low-yang and is a bad portmanteau of 'Clojure' and 'golang' (the much-better 'gojure' is already taken).
 
 There are a few benefits in doing this, beyond my personal entertainment:
 
