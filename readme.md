@@ -11,7 +11,7 @@ There are a few benefits in doing this, beyond my personal entertainment:
 There are also some drawbacks:
 
 - It will likely be slow. Like, slower than ruby slow. This is mostly because I'm basically an idiot compared to people who write good fast VM-type things, and I've never read any books or academic papers about optimizing compilers. I might change the latter situation when it comes time to start writing the actual interprety bits.
-- Interop can be from the Go side only, and Go doesn't have dynamic linking so if you write wrapper code for a go library, you need to compile Clojang with your wrapper included. i.e. While Clojang doesn't have to reinvent the world, it does have to wrap and link the world. There may be an interesting way to deal with the dynamic linking issue; which involves having multiple copies of Clojang around, each with a different set of libs compiled in. I'd guess that 99% of the nasty organisation stuff can be taken care of automatically. But I suppose that's only worth exploring if Clojang manages to win the hearts and minds of good folk such as yourself.
+- Interop can be from the Go side only, and Go doesn't have dynamic linking so if you write wrapper code for a go library, you need to compile Clojang with your wrapper included. i.e. While Clojang doesn't have to reinvent the world, it does have to wrap and link the world. There may be an interesting way to deal with the dynamic linking issue; which involves having multiple copies of Clojang around, each with a different set of libs compiled in. I'd guess that 99% of the nasty organisation stuff can be taken care of automatically. But I suppose that's only worth exploring if Clojang manages to win hearts and minds.
 
 
 ### What's done?
