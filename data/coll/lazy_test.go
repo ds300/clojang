@@ -23,12 +23,18 @@ func naturalIntegers (from uint) i.ISeq {
 func TestLazy (t *testing.T) {
   t.Log("ok")
 
-  seq := take(500, naturalIntegers(0))
+
+
+  seq := take(10, naturalIntegers(0))
+
+  head := seq
 
   for seq != nil {
     t.Log(seq.First())
     seq = seq.Rest()
   }
 
-  mock("cheese", 5)
+  t.Log("That first value again was", head.First())
+
+  t.Log(head)
 }

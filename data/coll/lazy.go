@@ -5,27 +5,31 @@ import "sync"
 
 type lazySeq struct {
   v i.IObj
-  fn func () i.ISeq
   next i.ISeq
+  mutex *sync.Mutex
+  fn func () i.ISeq
 }
 
 func (ls *lazySeq) First() i.IObj {
-  if ls.fn != nil {
-    res := ls.fn()
-    if res == nil {
-      ls.v = nil
+  mutex := ls.mutex
+  if mutex != nil {
+    mutex.Lock()
+    if ls.fn != nil {
+      res := ls.fn()
+      if res == nil {
+       ls.v = nil
+       ls.next = nil
+      } else {
+       ls.v = res.First()
+       ls.next = res.Rest()
+      }
       ls.fn = nil
-      ls.next = nil
-      return nil
-    } else {
-      ls.v = res.First()
-      ls.next = res.Rest()
-      ls.fn = nil
-      return ls.v
+      ls.mutex = nil
     }
-  } else {
-    return ls.v
+    mutex.Unlock()
   }
+
+  return ls.v
 }
 
 func (ls *lazySeq) Rest() i.ISeq {
@@ -33,17 +37,7 @@ func (ls *lazySeq) Rest() i.ISeq {
   return ls.next
 }
 
-func lockFn(fn func () i.ISeq) func () i.ISeq {
-  var mutex sync.Mutex
-  return func () i.ISeq {
-    mutex.Lock()
-    res := fn()
-    mutex.Unlock()
-    return res
-  }
-}
-
 func LazySeq(fn func () i.ISeq) i.ISeq {
-  ls := lazySeq{nil, lockFn(fn), nil}
+  ls := lazySeq{nil, nil, new(sync.Mutex), fn}
   return &ls
 }
