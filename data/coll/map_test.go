@@ -1,7 +1,7 @@
 package coll
 
 import "testing"
-import "clojang/data/types/i"
+import "clojang/data/i"
 import "fmt"
 
 // we need a thing that implements IObj

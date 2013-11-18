@@ -2,7 +2,7 @@ package hamt
 
 import "testing"
 import "fmt"
-import "clojang/data/types/i"
+import "clojang/data/i"
 
 // we need a thing that implements IObj
 

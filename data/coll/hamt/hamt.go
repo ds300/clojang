@@ -1,6 +1,6 @@
 package hamt
 
-import "clojang/data/types/i"
+import "clojang/data/i"
 
 const NILHASH = 29320394
 

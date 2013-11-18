@@ -1,7 +1,7 @@
 package coll
 
-import "clojang/data/types/i"
-import "clojang/data/types/hamt"
+import "clojang/data/i"
+import "clojang/data/coll/hamt"
 
 const nilhash = 29320394
 const starthash = 5381
@@ -58,7 +58,12 @@ func (hmap *hamtMap) Get(key i.IObj) i.IObj {
       return nil
     }
   } else {
-    return hmap.root.EntryAt(key, key.Hash(), 0).Val
+    e := hmap.root.EntryAt(key, key.Hash(), 0) 
+    if e != nil {
+      return e.Val
+    } else {
+      return nil
+    }
   }
 }
 
