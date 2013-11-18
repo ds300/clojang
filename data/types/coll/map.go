@@ -1,35 +1,29 @@
-package types
+package coll
+
+import "clojang/data/types/i"
+import "clojang/data/types/hamt"
 
 const nilhash = 29320394
-
-type MapEntry interface {
-  Key() IObj
-  Val() IObj
-}
-
-func (e *keyVal) Key() IObj {
-  return e.key
-}
-
-func (e *keyVal) Val() IObj {
-  return e.val
-}
+const starthash = 5381
 
 type Map interface {
-  With (key IObj, val IObj) Map
-  Without(key IObj) Map
-  Get(key IObj) IObj
-  Contains(key IObj) bool
-  EntryAt(key IObj) MapEntry
+  With (key i.IObj, val i.IObj) Map
+  Without(key i.IObj) Map
+  Get(key i.IObj) i.IObj
+  Contains(key i.IObj) bool
+  EntryAt(key i.IObj) *hamt.Entry
   Size() uint
+  Hash() uint
+  String() string
+  Equals(other i.IObj) bool
 }
 
 type hamtMap struct {
   count uint
   hash uint
   hasNil bool
-  nilEntry *keyVal
-  root inode
+  nilEntry *hamt.Entry
+  root hamt.INode
 }
 
 func (hmap *hamtMap) Size() uint {
@@ -40,27 +34,35 @@ func (hmap *hamtMap) Hash() uint {
   return hmap.hash
 } 
 
-func (hmap *hamtMap) Contains(key IObj) bool {
+func (hmap *hamtMap) String() string {
+  return ""
+}
+
+func (hmap *hamtMap) Equals(other i.IObj) bool {
+  return true
+}
+
+func (hmap *hamtMap) Contains(key i.IObj) bool {
   if key == nil {
     return hmap.hasNil
   } else {
-    return hmap.root.entryAt(key, key.Hash(), 0) != nil
+    return hmap.root.EntryAt(key, key.Hash(), 0) != nil
   }
 }
 
-func (hmap *hamtMap) Get(key IObj) IObj {
+func (hmap *hamtMap) Get(key i.IObj) i.IObj {
   if key == nil {
     if hmap.hasNil {
-      return hmap.nilEntry.val
+      return hmap.nilEntry.Val
     } else {
       return nil
     }
   } else {
-    return hmap.root.entryAt(key, key.Hash(), 0).val
+    return hmap.root.EntryAt(key, key.Hash(), 0).Val
   }
 }
 
-func (hmap *hamtMap) EntryAt(key IObj) MapEntry {
+func (hmap *hamtMap) EntryAt(key i.IObj) *hamt.Entry {
   if key == nil {
     if hmap.hasNil {
       return hmap.nilEntry
@@ -68,7 +70,7 @@ func (hmap *hamtMap) EntryAt(key IObj) MapEntry {
       return nil
     }
   } else {
-    return hmap.root.entryAt(key, key.Hash(), 0)
+    return hmap.root.EntryAt(key, key.Hash(), 0)
   }
 }
 
@@ -76,7 +78,7 @@ func clone (m hamtMap) *hamtMap {
   return &m
 }
 
-func (hmap *hamtMap) With(key IObj, val interface{}) Map {
+func (hmap *hamtMap) With(key i.IObj, val i.IObj) Map {
   if key == nil {
     newMap := clone(*hmap)
     if !hmap.hasNil {
@@ -84,12 +86,12 @@ func (hmap *hamtMap) With(key IObj, val interface{}) Map {
       newMap.hasNil = true
       newMap.hash *= nilhash
     }
-    newMap.nilEntry = newEntry(key, val)
+    newMap.nilEntry = hamt.NewEntry(key, val)
     return newMap
 
   } else {
     hash := key.Hash()
-    newRoot, incCount := hmap.root.with(newEntry(key, val), hash, 0)
+    newRoot, incCount := hmap.root.With(hamt.NewEntry(key, val), hash, 0)
     newMap := clone(*hmap)
     if incCount {
       newMap.count += 1
@@ -102,7 +104,7 @@ func (hmap *hamtMap) With(key IObj, val interface{}) Map {
   }
 }
 
-func (hmap *hamtMap) Without(key IObj) Map {
+func (hmap *hamtMap) Without(key i.IObj) Map {
   if key == nil {
     if hmap.hasNil {
       newMap := clone(*hmap)
@@ -115,7 +117,7 @@ func (hmap *hamtMap) Without(key IObj) Map {
     }
   } else {
     hash := key.Hash()
-    newRoot, decCount := hmap.root.without(key, hash, 0)
+    newRoot, decCount := hmap.root.Without(key, hash, 0)
     newMap := clone(*hmap)
     if decCount {
       newMap.count -= 1
@@ -124,7 +126,7 @@ func (hmap *hamtMap) Without(key IObj) Map {
       }
     }
     if newRoot == nil {
-      newRoot = new(hamtNode)
+      newRoot = hamt.EmptyNode(false)
     }
     newMap.root = newRoot
     return newMap
@@ -133,7 +135,7 @@ func (hmap *hamtMap) Without(key IObj) Map {
 
 func NewMap() Map {
   m := new(hamtMap)
-  m.root = new(hamtNode)
-  m.hash = 1
+  m.root = hamt.EmptyNode(false)
+  m.hash = starthash
   return m
 }

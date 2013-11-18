@@ -29,9 +29,8 @@ func newMock(val interface{}, hash uint) *mock {
   return &m
 }
 
-// this one is pretty trivial
 func TestEmpty (t *testing.T) {
-  empty := new(EmptyNode)
+  empty := EmptyNode(false)
 
   entry := NewEntry(newMock("hello", 5), newMock("world", 6))
 
@@ -57,7 +56,6 @@ func TestEmpty (t *testing.T) {
   }
 }
 
-// this one is also pretty trivial
 func TestEntry (t *testing.T) {
   entry := NewEntry(newMock("hello", 5), newMock("world", 6))
 
@@ -219,7 +217,102 @@ func TestCollide (t *testing.T) {
   if !ok || !decCount || c3 != e2 {
     t.Log("the wrong thing got removed")
   }
+}
+
+
+func TestHamt (t *testing.T) {
+  n := new(hamtNode)
+
+  k1 := newMock("hello", 10)
+  v1 := newMock("world", 10)
+
+  k2 := newMock("goodbye", 11)
+  v2 := newMock("sir", 11)
+
+  n1, incCount := n.With(NewEntry(k1, v1), 10, 0)
+
+  if !n1.EntryAt(k1, 10, 0).Val.Equals(v1) {
+    t.Log("put/get bad for hamtNode")
+    t.Fail()
+  }
+
+  if !incCount {
+    t.Log("put didn't increase count for hamtNode")
+    t.Fail()
+  }
+
+  n2, incCount2 := n1.With(NewEntry(k2, v2), 11, 0)
+
+  if !n2.EntryAt(k2, 11, 0).Val.Equals(v2) {
+    t.Log("second put/get bad for hamtNode")
+    t.Fail()
+  }
+
+  if !incCount2 {
+    t.Log("put 2 didn't increase count for hamtNode")
+    t.Fail()
+  }
+
+  k3 := newMock("hey", 10) //hash collision with k1
+  v3 := newMock("there", 5)
+
+  n3, incCount3 := n2.With(NewEntry(k3, v3), 10, 0)
+
+  if !n3.EntryAt(k1, 10, 0).Val.Equals(v1) {
+    t.Log("hamtNode collision obliterated existing")
+    t.Fail()
+  }
+
+  if !n3.EntryAt(k3, 10, 0).Val.Equals(v3) {
+    t.Log("hamtNode collision didn't keep new")
+    t.Fail()
+  }
+
+  if !incCount3 {
+    t.Log("put 3 didn't increase count for hamtNode")
+    t.Fail()
+  }
+
+  // without k2 should return collision node
+  cn, decCount := n3.Without(k2, 11, 0)
+
+  _, ok := cn.(*collisionNode)
+
+  if !ok {
+    t.Log("Without didn't return collision node, when it shoulda")
+    t.Fail()
+  }
+
+  if !decCount {
+    t.Log("Removing a thing didn't cause count dec")
+    t.Fail()
+  }
+
+  if !n3.EntryAt(k2, 11, 0).Val.Equals(v2) {
+    t.Log("removing a thing is not immutable")
+    t.Fail()
+  }
+
+  e1, decCount2 := n2.Without(k2, 11, 0)
+
+  if !decCount2 {
+    t.Log("Removing a thing didn't cause count dec when both entries")
+    t.Fail()
+  }
+
+  _, aok := e1.(*Entry)
+
+  if !aok {
+    t.Log("removing a thing when two entries remain didn't just return the other entry")
+    t.Fail()
+  }
+
+  if !e1.(*Entry).Val.Equals(v1) {
+    t.Log("The wrong entry was returned when two entries remained and one got removed")
+    t.Fail()
+  }
 
 }
+
 
 
