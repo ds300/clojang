@@ -10,10 +10,8 @@ type collisionNode struct {
 
 
 func newCollisionNode (hash uint, vals []*Entry) *collisionNode {
-  node := new(collisionNode)
-  node.collisionHash = hash
-  node.entries = vals
-  return node
+  node := collisionNode{hash, vals}
+  return &node
 }
 
 
@@ -35,15 +33,22 @@ func (node *collisionNode) Without(key i.IObj, hash, shift uint) (INode, bool) {
     for i, v := range node.entries {
       if key.Equals(v.Key) {
         // uh-oh, we have to delete the thing
-        if len(node.entries) > 1 {
-          newvals := make([]*Entry, len(node.entries)-1)
-
-          copy(newvals[0:], node.entries[0:i])
-          copy(newvals[i:], node.entries[i+1:])
-
-          return newCollisionNode(hash, newvals), true
-        } else {
+        switch len(node.entries) {
+        case 1:
+          // if this is the only thing left, just get rid of this node
+          // I'm not sure this will ever get called given the case 2
           return nil, true
+        case 2:
+          // there will only be one entry left after this, so just return that
+          // entry instead
+          return node.entries[i ^ 1], true
+        default:
+          newEntries := make([]*Entry, len(node.entries)-1)
+
+          copy(newEntries[0:], node.entries[0:i])
+          copy(newEntries[i:], node.entries[i+1:])
+
+          return newCollisionNode(hash, newEntries), true
         }
       }
     }

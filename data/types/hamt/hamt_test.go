@@ -131,8 +131,8 @@ func TestDistinguish (t *testing.T) {
     t.Fail()
   }
 
-  if hn.kids[0] != e1 {
-    t.Log("e1 was not in the suspected place")
+  if hn.kids[1] != e2 {
+    t.Log("e2 was not in the suspected place")
     t.Fail()
   }
 }
@@ -176,4 +176,50 @@ func TestIdxMask (t *testing.T) {
     t.Fail()
   }
 }
+
+
+func TestCollide (t *testing.T) {
+  collider := newCollisionNode(10, nil)
+
+  m1 := newMock(3, 10)
+  m2 := newMock(4, 10)
+
+  e1 := NewEntry(m1, newMock("e1",1))
+  e2 := NewEntry(m2, newMock("e2",1))
+
+  collider1, incCount1 := collider.With(e1, 10, 0)
+  collider2, incCount2 := collider1.With(e2, 10, 0)
+
+  if collider.EntryAt(m1, 10, 0) != nil ||
+     collider.EntryAt(m2, 10, 0) != nil {
+      t.Log("the original collider isn't empty?!")
+      t.Fail()
+  }
+
+  if !collider1.EntryAt(m1, 10, 9).Val.Equals(newMock("e1",1)) ||
+     collider1.EntryAt(m2, 10, 0) != nil {
+      t.Log("collider1 contains the wrong stuff")
+      t.Fail()    
+  }
+
+  if !collider2.EntryAt(m1, 10, 9).Val.Equals(newMock("e1", 1)) ||
+     !collider2.EntryAt(m2, 10, 9).Val.Equals(newMock("e2", 4)) {
+      t.Log("collider2 contains the wrong stuff")
+      t.Fail()    
+  }
+
+  if !incCount1 || !incCount2 {
+    t.Log("collision node isn't increasing count with new elems")
+    t.Fail()
+  }
+
+  collider3, decCount := collider2.Without(m1, 10, 0)
+
+  c3, ok := collider3.(*Entry)
+  if !ok || !decCount || c3 != e2 {
+    t.Log("the wrong thing got removed")
+  }
+
+}
+
 
