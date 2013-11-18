@@ -1,6 +1,6 @@
 package hamt
 
-import "clojang/data/i"
+import . "clojang/data/interfaces"
 
 type collisionNode struct {
   collisionHash uint
@@ -35,7 +35,7 @@ func newCollisionNode (hash uint, vals []*Entry) *collisionNode {
 }
 
 
-func (node *collisionNode) EntryAt(key i.IObj, hash, shift uint) *Entry {
+func (node *collisionNode) EntryAt(key IObj, hash, shift uint) *Entry {
   if hash != node.collisionHash {
     return nil
   } else {
@@ -48,7 +48,7 @@ func (node *collisionNode) EntryAt(key i.IObj, hash, shift uint) *Entry {
   }
 }
 
-func (node *collisionNode) Without(key i.IObj, hash, shift uint) (INode, bool) {
+func (node *collisionNode) Without(key IObj, hash, shift uint) (INode, bool) {
   if hash == node.collisionHash {
     for i, v := range node.entries {
       if key.Equals(v.Key) {

@@ -3,7 +3,7 @@ package hamt
 import "testing"
 import "fmt"
 import "bufio"
-import "clojang/data/i"
+import . "clojang/data/interfaces"
 
 // we need a thing that implements IObj
 
@@ -16,7 +16,7 @@ func (m *mock) Write(w bufio.Writer) {
 }
 
 
-func (m *mock) Equals(o i.IObj) bool {
+func (m *mock) Equals(o IObj) bool {
   v, ok := o.(*mock)
   return ok && v.val == m.val
 }

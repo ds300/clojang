@@ -1,10 +1,10 @@
 package hamt
 
-import "clojang/data/i"
+import . "clojang/data/interfaces"
 
 type Entry struct {
-  Key i.IObj
-  Val i.IObj
+  Key IObj
+  Val IObj
 }
 
 // this should never be called
@@ -12,12 +12,12 @@ func (node *Entry) Nodes() NodeIterator {
   return nil
 }
 
-func NewEntry (key i.IObj, val i.IObj) *Entry {
+func NewEntry (key IObj, val IObj) *Entry {
   e := Entry{key, val}
   return &e
 }
 
-func (entry *Entry) EntryAt (key i.IObj, hash, shift uint) *Entry {
+func (entry *Entry) EntryAt (key IObj, hash, shift uint) *Entry {
   if key.Equals(entry.Key) {
     return entry
   } else {
@@ -45,7 +45,7 @@ func (entry *Entry) With (other *Entry, hash, shift uint) (INode, bool) {
   }
 }
 
-func (entry *Entry) Without (key i.IObj, hash, shift uint) (INode, bool) {
+func (entry *Entry) Without (key IObj, hash, shift uint) (INode, bool) {
   ehash := entry.Key.Hash()
   if ehash == hash && key.Equals(entry.Key) {
     return nil, true

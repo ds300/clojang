@@ -1,13 +1,13 @@
 package hamt
 
-import "clojang/data/i"
+import . "clojang/data/interfaces"
 
 const NILHASH = 29320394
 
 type INode interface {
-  EntryAt (key i.IObj, hash, shift uint) *Entry
+  EntryAt (key IObj, hash, shift uint) *Entry
   With (entry *Entry, hash, shift uint) (INode, bool)
-  Without (key i.IObj, hash, shift uint) (INode, bool)
+  Without (key IObj, hash, shift uint) (INode, bool)
   Nodes () NodeIterator 
 }
 
@@ -59,7 +59,7 @@ func (node *hamtNode) Nodes() NodeIterator {
   return &ret
 }
 
-func (node *hamtNode) EntryAt(key i.IObj, hash, shift uint) *Entry {
+func (node *hamtNode) EntryAt(key IObj, hash, shift uint) *Entry {
   idx, mask := idxMask(hash, shift)
   
   if mask & node.index > 0 {
@@ -96,7 +96,7 @@ func replaceKidAt(node *hamtNode, newKid INode, pos byte) *hamtNode {
   return newNode
 }
 
-func (node *hamtNode) Without(key i.IObj, hash, shift uint) (INode, bool) {
+func (node *hamtNode) Without(key IObj, hash, shift uint) (INode, bool) {
   idx, mask := idxMask(hash, shift)
 
   if mask & node.index > 0 {
