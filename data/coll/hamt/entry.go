@@ -7,6 +7,11 @@ type Entry struct {
   Val i.IObj
 }
 
+// this should never be called
+func (node *Entry) Nodes() NodeIterator {
+  return nil
+}
+
 func NewEntry (key i.IObj, val i.IObj) *Entry {
   e := Entry{key, val}
   return &e

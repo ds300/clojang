@@ -2,6 +2,7 @@ package coll
 
 import "clojang/data/i"
 import "clojang/data/coll/hamt"
+import "bufio"
 
 const nilhash = 29320394
 const starthash = 5381
@@ -15,7 +16,9 @@ type Map interface {
   Size() uint
   Hash() uint
   String() string
+  Write(w bufio.Writer)
   Equals(other i.IObj) bool
+  Seq() i.ISeq
 }
 
 type hamtMap struct {
@@ -38,13 +41,24 @@ func (hmap *hamtMap) String() string {
   return ""
 }
 
+func (hmap *hamtMap) Write(w bufio.Writer) {
+
+}
+
 func (hmap *hamtMap) Equals(other i.IObj) bool {
   return true
 }
 
+func (hmap *hamtMap) Seq() i.ISeq {
+  return nil
+}
+
+
 func (hmap *hamtMap) Contains(key i.IObj) bool {
   if key == nil {
     return hmap.hasNil
+  } else if hmap.root == nil {
+    return false
   } else {
     return hmap.root.EntryAt(key, key.Hash(), 0) != nil
   }
@@ -96,7 +110,14 @@ func (hmap *hamtMap) With(key i.IObj, val i.IObj) Map {
 
   } else {
     hash := key.Hash()
-    newRoot, incCount := hmap.root.With(hamt.NewEntry(key, val), hash, 0)
+    var newRoot hamt.INode
+    var incCount bool
+    if hmap.root == nil {
+      newRoot = hamt.NewEntry(key, val)
+      incCount = true
+    } else {
+      newRoot, incCount = hmap.root.With(hamt.NewEntry(key, val), hash, 0)
+    }
     newMap := clone(*hmap)
     if incCount {
       newMap.count += 1
@@ -121,26 +142,26 @@ func (hmap *hamtMap) Without(key i.IObj) Map {
       return hmap
     }
   } else {
-    hash := key.Hash()
-    newRoot, decCount := hmap.root.Without(key, hash, 0)
-    newMap := clone(*hmap)
-    if decCount {
-      newMap.count -= 1
-      if hash != 0 {
-        newMap.hash /= hash
+    if hmap.root == nil {
+      return hmap
+    } else {
+      hash := key.Hash()
+      newRoot, decCount := hmap.root.Without(key, hash, 0)
+      newMap := clone(*hmap)
+      if decCount {
+       newMap.count -= 1
+       if hash != 0 {
+         newMap.hash /= hash
+       }
       }
+      newMap.root = newRoot
+      return newMap
     }
-    if newRoot == nil {
-      newRoot = hamt.EmptyNode(false)
-    }
-    newMap.root = newRoot
-    return newMap
   }
 }
 
 func NewMap() Map {
   m := new(hamtMap)
-  m.root = hamt.EmptyNode(false)
   m.hash = starthash
   return m
 }

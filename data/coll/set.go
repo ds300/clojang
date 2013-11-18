@@ -79,7 +79,14 @@ func (hset *hamtSet) With(key i.IObj) Set {
 
   } else {
     hash := key.Hash()
-    newRoot, incCount := hset.root.With(hamt.NewEntry(key, nil), hash, 0)
+    var newRoot hamt.INode
+    var incCount bool
+    if hset.root == nil {
+      newRoot = hamt.NewEntry(key, nil)
+      incCount = true
+    } else {
+      newRoot, incCount = hset.root.With(hamt.NewEntry(key, nil), hash, 0)
+    }
     newSet := cloneSet(*hset)
     if incCount {
       newSet.count += 1
@@ -104,26 +111,29 @@ func (hset *hamtSet) Without(key i.IObj) Set {
       return hset
     }
   } else {
-    hash := key.Hash()
-    newRoot, decCount := hset.root.Without(key, hash, 0)
-    newSet := cloneSet(*hset)
-    if decCount {
-      newSet.count -= 1
-      if hash != 0 {
-        newSet.hash /= hash
+    if hset.root == nil {
+      return hset
+    } else {
+      hash := key.Hash()
+      newRoot, decCount := hset.root.Without(key, hash, 0)
+      newSet := cloneSet(*hset)
+      if decCount {
+        newSet.count -= 1
+        if hash != 0 {
+          newSet.hash /= hash
+        }
       }
+
+      newSet.root = newRoot
+      return newSet
     }
-    if newRoot == nil {
-      newRoot = hamt.EmptyNode(false)
-    }
-    newSet.root = newRoot
-    return newSet
+      
+    
   }
 }
 
 func NewSet() Set {
   m := new(hamtSet)
-  m.root = hamt.EmptyNode(false)
   m.hash = starthash
   return m
 }

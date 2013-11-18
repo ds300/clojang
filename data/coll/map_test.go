@@ -1,45 +1,27 @@
 package coll
 
 import "testing"
-import "clojang/data/i"
-import "fmt"
+
 
 // we need a thing that implements IObj
 
-type mock struct {
-  val interface{}
-  hash uint
-}
-
-func (m *mock) Equals(o i.IObj) bool {
-  v, ok := o.(*mock)
-  return ok && v.val == m.val
-}
-
-func (m *mock) Hash() uint {
-  return m.hash
-}
-
-func (m *mock) String() string {
-  return fmt.Sprint("(", m.val, ":", m.hash, ")")
-}
-
-func newMock(val interface{}, hash uint) *mock {
-  m := mock{val, hash}
-  return &m
-}
 
 func TestMap (t *testing.T) {
   m := NewMap()
-  m1 := m.With(newMock("cheese", 323242), newMock("jones", 3234224))
+  m1 := m.With(mock("cheese", 323242), mock("jones", 3234224))
 
-  if m.Contains(newMock("cheese", 323242)) {
+  if m.Contains(mock("cheese", 323242)) {
     t.Log("immutability breakdown")
     t.Fail()
   }
 
-  if !m1.Contains(newMock("cheese", 323242)) {
+  if !m1.Contains(mock("cheese", 323242)) {
     t.Log("the thing didn't get put in")
+    t.Fail()
+  }
+
+  if !m1.EntryAt(mock("cheese", 323242)).Val.Equals(mock("jones", 3)) {
+    t.Log("the thing got put in but isn't being returned")
     t.Fail()
   }
 

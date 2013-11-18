@@ -7,6 +7,26 @@ type collisionNode struct {
   entries []*Entry
 }
 
+type collisionNodeIterator struct {
+  index uint
+  entries *[]*Entry
+}
+
+func (cni *collisionNodeIterator) HasNext() bool {
+  return cni.index < uint(len(*cni.entries))
+}
+
+func (cni *collisionNodeIterator) Next() INode {
+  ret := (*cni.entries)[cni.index]
+  cni.index += 1
+  return ret
+}
+
+func (node *collisionNode) Nodes() NodeIterator {
+  ret := collisionNodeIterator{0, &node.entries}
+  return &ret
+}
+
 
 
 func newCollisionNode (hash uint, vals []*Entry) *collisionNode {

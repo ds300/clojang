@@ -2,6 +2,7 @@ package hamt
 
 import "testing"
 import "fmt"
+import "bufio"
 import "clojang/data/i"
 
 // we need a thing that implements IObj
@@ -11,10 +12,15 @@ type mock struct {
   hash uint
 }
 
+func (m *mock) Write(w bufio.Writer) {
+}
+
+
 func (m *mock) Equals(o i.IObj) bool {
   v, ok := o.(*mock)
   return ok && v.val == m.val
 }
+
 
 func (m *mock) Hash() uint {
   return m.hash
@@ -24,36 +30,11 @@ func (m *mock) String() string {
   return fmt.Sprint("(", m.val, ":", m.hash, ")")
 }
 
+
+
 func newMock(val interface{}, hash uint) *mock {
   m := mock{val, hash}
   return &m
-}
-
-func TestEmpty (t *testing.T) {
-  empty := EmptyNode(false)
-
-  entry := NewEntry(newMock("hello", 5), newMock("world", 6))
-
-  empty2, incCount := empty.With(entry, 5, 0)
-
-  if empty2 != entry || !incCount {
-    t.Log("assertion failed: empty2 == entry && incCount")
-    t.Fail()
-  }
-
-  empty3, decCount := empty.Without(newMock("hello", 5), 5, 0)
-
-  if empty3 != empty || decCount {
-    t.Log("assertion failed: empty3 == empty && !decCount")
-    t.Fail()
-  }
-
-  val := empty.EntryAt(newMock("hello", 5), 5, 0)
-
-  if val != nil {
-    t.Log("Assertion failed: val == nil")
-    t.Fail()
-  }
 }
 
 func TestEntry (t *testing.T) {

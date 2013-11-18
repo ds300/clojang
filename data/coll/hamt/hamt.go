@@ -8,6 +8,12 @@ type INode interface {
   EntryAt (key i.IObj, hash, shift uint) *Entry
   With (entry *Entry, hash, shift uint) (INode, bool)
   Without (key i.IObj, hash, shift uint) (INode, bool)
+  Nodes () NodeIterator 
+}
+
+type NodeIterator interface {
+  HasNext() bool
+  Next() INode
 }
 
 func popcount(x uint) byte {
@@ -31,6 +37,26 @@ func idxMask(hash, shift uint) (uint, uint) {
 type hamtNode struct {
   index uint
   kids []INode
+}
+
+type hamtNodeIterator struct {
+  index uint
+  kids *[]INode
+}
+
+func (hni *hamtNodeIterator) HasNext() bool {
+  return hni.index < uint(len(*hni.kids))
+}
+
+func (hni *hamtNodeIterator) Next() INode {
+  ret := (*hni.kids)[hni.index]
+  hni.index += 1
+  return ret
+}
+
+func (node *hamtNode) Nodes() NodeIterator {
+  ret := hamtNodeIterator{0, &node.kids}
+  return &ret
 }
 
 func (node *hamtNode) EntryAt(key i.IObj, hash, shift uint) *Entry {
