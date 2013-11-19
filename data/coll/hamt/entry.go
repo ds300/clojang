@@ -3,8 +3,7 @@ package hamt
 import . "clojang/data/interfaces"
 
 type Entry struct {
-  Key IObj
-  Val IObj
+  IMapEntry
 }
 
 // this should never be called
