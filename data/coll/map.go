@@ -7,19 +7,7 @@ import "bufio"
 const nilhash = 29320394
 const starthash = 5381
 
-type Map interface {
-  With (key i.IObj, val i.IObj) Map
-  Without(key i.IObj) Map
-  Get(key i.IObj) i.IObj
-  Contains(key i.IObj) bool
-  EntryAt(key i.IObj) *hamt.Entry
-  Size() uint
-  Hash() uint
-  String() string
-  Write(w bufio.Writer)
-  Equals(other i.IObj) bool
-  Seq() i.ISeq
-}
+
 
 type hamtMap struct {
   count uint

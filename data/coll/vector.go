@@ -17,11 +17,5 @@ func sliceVectorSeq(v *sliceVector, i, n int) i.ISeq {
 
 
 func (v *sliceVector) Seq() i.ISeq {
-  i := 0
-  n := len(*v)
-  return LazySeq(func () i.ISeq {
-    if i < n {
-      return Cons()
-    }
-    })
+  return sliceVectorSeq(v, 0, len(*v))
 }

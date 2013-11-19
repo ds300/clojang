@@ -1,2 +1,2 @@
-(bitch :true "monkeyface
-  is my mother's bitchy nephew" (43/6 1.00000))
+(hello :true "this
+  is my favourite string" (43/6 1.00000))

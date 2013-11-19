@@ -3,11 +3,7 @@ package types
 import "fmt"
 import "strconv"
 
-type IObj interface {
-  String() string
-  Hash() uint
-  Equals(other IObj) bool
-}
+
 
 type List struct {
   Val IObj
