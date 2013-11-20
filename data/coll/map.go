@@ -1,6 +1,14 @@
+// Copyright (c) David Sheldrick. All rights reserved.
+// The use and distribution terms for this software are covered by the
+// Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+// which can be found in the file epl-v10.html at the root of this distribution.
+// By using this software in any fashion, you are agreeing to be bound by
+// the terms of this license.
+// You must not remove this notice, or any other, from this software.
+
 package coll
 
-import "clojang/data/i"
+import . "clojang/data/interfaces"
 import "clojang/data/coll/hamt"
 import "bufio"
 
@@ -33,16 +41,16 @@ func (hmap *hamtMap) Write(w bufio.Writer) {
 
 }
 
-func (hmap *hamtMap) Equals(other i.IObj) bool {
+func (hmap *hamtMap) Equals(other IObj) bool {
   return true
 }
 
-func (hmap *hamtMap) Seq() i.ISeq {
+func (hmap *hamtMap) Seq() ISeq {
   return nil
 }
 
 
-func (hmap *hamtMap) Contains(key i.IObj) bool {
+func (hmap *hamtMap) Contains(key IObj) bool {
   if key == nil {
     return hmap.hasNil
   } else if hmap.root == nil {
@@ -52,7 +60,7 @@ func (hmap *hamtMap) Contains(key i.IObj) bool {
   }
 }
 
-func (hmap *hamtMap) Get(key i.IObj) i.IObj {
+func (hmap *hamtMap) Get(key IObj) IObj {
   if key == nil {
     if hmap.hasNil {
       return hmap.nilEntry.Val
@@ -69,7 +77,7 @@ func (hmap *hamtMap) Get(key i.IObj) i.IObj {
   }
 }
 
-func (hmap *hamtMap) EntryAt(key i.IObj) *hamt.Entry {
+func (hmap *hamtMap) EntryAt(key IObj) *hamt.Entry {
   if key == nil {
     if hmap.hasNil {
       return hmap.nilEntry
@@ -85,7 +93,7 @@ func clone (m hamtMap) *hamtMap {
   return &m
 }
 
-func (hmap *hamtMap) With(key i.IObj, val i.IObj) Map {
+func (hmap *hamtMap) With(key IObj, val IObj) Map {
   if key == nil {
     newMap := clone(*hmap)
     if !hmap.hasNil {
@@ -118,7 +126,7 @@ func (hmap *hamtMap) With(key i.IObj, val i.IObj) Map {
   }
 }
 
-func (hmap *hamtMap) Without(key i.IObj) Map {
+func (hmap *hamtMap) Without(key IObj) Map {
   if key == nil {
     if hmap.hasNil {
       newMap := clone(*hmap)

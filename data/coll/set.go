@@ -1,20 +1,28 @@
+// Copyright (c) David Sheldrick. All rights reserved.
+// The use and distribution terms for this software are covered by the
+// Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+// which can be found in the file epl-v10.html at the root of this distribution.
+// By using this software in any fashion, you are agreeing to be bound by
+// the terms of this license.
+// You must not remove this notice, or any other, from this software.
+
 package coll
 
-import "clojang/data/i"
+import . "clojang/data/interfaces"
 import "clojang/data/coll/hamt"
 
 // const nilhash = 29320394
 // const starthash = 5381
 
 type Set interface {
-  With (key i.IObj) Set
-  Without(key i.IObj) Set
-  Get(key i.IObj) i.IObj
-  Contains(key i.IObj) bool
+  With (key IObj) Set
+  Without(key IObj) Set
+  Get(key IObj) IObj
+  Contains(key IObj) bool
   Size() uint
   Hash() uint
   String() string
-  Equals(other i.IObj) bool
+  Equals(other IObj) bool
 }
 
 type hamtSet struct {
@@ -36,11 +44,11 @@ func (hset *hamtSet) String() string {
   return ""
 }
 
-func (hset *hamtSet) Equals(other i.IObj) bool {
+func (hset *hamtSet) Equals(other IObj) bool {
   return true
 }
 
-func (hset *hamtSet) Contains(key i.IObj) bool {
+func (hset *hamtSet) Contains(key IObj) bool {
   if key == nil {
     return hset.hasNil
   } else {
@@ -48,7 +56,7 @@ func (hset *hamtSet) Contains(key i.IObj) bool {
   }
 }
 
-func (hset *hamtSet) Get(key i.IObj) i.IObj {
+func (hset *hamtSet) Get(key IObj) IObj {
   if key == nil {
     return nil
   } else {
@@ -65,7 +73,7 @@ func cloneSet (m hamtSet) *hamtSet {
   return &m
 }
 
-func (hset *hamtSet) With(key i.IObj) Set {
+func (hset *hamtSet) With(key IObj) Set {
   if key == nil {
     if hset.hasNil {
       return hset
@@ -99,7 +107,7 @@ func (hset *hamtSet) With(key i.IObj) Set {
   }
 }
 
-func (hset *hamtSet) Without(key i.IObj) Set {
+func (hset *hamtSet) Without(key IObj) Set {
   if key == nil {
     if hset.hasNil {
       newSet := cloneSet(*hset)
