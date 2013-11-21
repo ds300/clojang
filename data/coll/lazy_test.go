@@ -1,21 +1,21 @@
 package coll
 
 import "testing"
-import "clojang/data/i"
+import . "clojang/data/interfaces"
 
-func take (n uint, seq i.ISeq) i.ISeq {
+func take (n uint, seq ISeq) ISeq {
   if n==0 || seq == nil {
     return nil
   } else {
-    return LazySeq(func () i.ISeq {
+    return LazySeq(func () ISeq {
       return Cons(seq.First(), take(n-1, seq.Rest()))
     })
   }
 }
 
 
-func naturalIntegers (from uint) i.ISeq {
-  return LazySeq(func () i.ISeq {
+func naturalIntegers (from uint) ISeq {
+  return LazySeq(func () ISeq {
     return Cons(mock(from, from), naturalIntegers(from+1))
   })
 }

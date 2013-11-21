@@ -28,3 +28,6 @@ func Cons(val IObj, seq ISeq) ISeq {
   return &ls
 }
 
+type EmtpyList struct {}
+
+func

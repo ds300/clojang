@@ -13,7 +13,9 @@ type IObj interface {
   String() string
   Hash() uint
   Equals(other IObj) bool
-  Write(w bufio.Writer)
+  // for serializing
+  Write(w bufio.Writer) error
+  Type() uint
 }
 
 type ICounted interface {
@@ -24,6 +26,7 @@ type ISeq interface {
   ISeqable
   First() IObj
   Rest() ISeq
+  Nth() ISeq, error
 }
 
 type IReversible interface {
@@ -38,7 +41,6 @@ type ISeqable interface {
 type IColl interface {
   ICounted
   Conj(o IObj) IColl
-  Disj(o IObj) IColl
   Contains(o IObj) bool
   ValAt(k IObj) IObj
   ValAtOr(k, notFount IObj) IObj
@@ -62,6 +64,12 @@ type IMapEntry interface {
   Val() IObj
 }
 
+type ISet interface {
+  IColl
+  Disj(o IObj) IColl
+}
+
+
 type IVector interface {
   IAssoc
   ISeqable
@@ -71,3 +79,4 @@ type IFn interface {
   Arity() uint
   Invoke(...IObj) IObj
 }
+

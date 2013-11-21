@@ -1,6 +1,6 @@
 package coll
 
-import "clojang/data/i"
+import . "clojang/data/interfaces"
 import "fmt"
 import "bufio"
 
@@ -17,7 +17,7 @@ func (m *mockIObj) Write(w bufio.Writer) {
 }
 
 
-func (m *mockIObj) Equals(o i.IObj) bool {
+func (m *mockIObj) Equals(o IObj) bool {
   v, ok := o.(*mockIObj)
   return ok && v.val == m.val
 }

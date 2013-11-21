@@ -10,29 +10,29 @@ package exec
 
 import "fmt"
 
-type stackElem struct {
+type callSite struct {
   line uint
   file *string
   name *string
-  below *stackElem
+  below *callSite
 }
 
-func StackElem(line uint, file *string, name *string) *stackElem {
-  x := stackElem{line, file, name, nil}
+func CallSite(line uint, file *string, name *string) *callSite {
+  x := callSite{line, file, name, nil}
   return &x
 }
 
 type CallStack struct {
   count uint
-  top *stackElem
+  top *callSite
 }
 
-func (cs *CallStack) Push(e *stackElem) {
+func (cs *CallStack) Push(e *callSite) {
   e.below = cs.top
   cs.top = e
 }
 
-func (cs *CallStack) Pop() *stackElem {
+func (cs *CallStack) Pop() *callSite {
   ret := cs.top
   if ret != nil {
     cs.top = ret.below
