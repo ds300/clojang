@@ -18,6 +18,15 @@ type IObj interface {
   Type() uint32
 }
 
+type IMeta interface {
+  WithMeta(meta IObj) IMeta
+  Meta() IObj
+}
+
+type INamed interface {
+  Name() string
+}
+
 type INumeric interface {
   Mult(other INumeric) INumeric
   Div(other INumeric) (INumeric, error)

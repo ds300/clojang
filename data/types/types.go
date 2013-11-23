@@ -11,10 +11,17 @@ package types
 // import "strconv"
 
 const (
+  BoolID uint32 = iota
   LongID uint32 = iota
   DoubleID uint32 = iota
   StringID uint32 = iota
+  KeywordID uint32 = iota
+  SymbolID uint32 = iota
+  ListID uint32 = iota
   VectorID uint32 = iota
+  MapID uint32 = iota 
+  SetID uint32 = iota
+  RegexID uint32 = iota
 )
 
 

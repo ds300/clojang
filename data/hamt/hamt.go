@@ -13,10 +13,9 @@ import . "clojang/data/interfaces"
 const NILHASH = 29320394
 
 type INode interface {
-  EntryAt (key IObj, hash, shift uint) *Entry
-  With (entry *Entry, hash, shift uint) (INode, bool)
-  Without (key IObj, hash, shift uint) (INode, bool)
-  Nodes () NodeIterator 
+  EntryAt (key IObj, hash, shift uint32) *Entry
+  With (entry *Entry, hash, shift uint32) (INode, *Entry)
+  Without (key IObj, hash, shift uint32) (INode, *Entry)
 }
 
 type NodeIterator interface {
@@ -24,36 +23,36 @@ type NodeIterator interface {
   Next() INode
 }
 
-func popcount(x uint) byte {
+func popcount(x uint32) byte {
   x -= ((x >> 1) & 0x55555555)
   x = (x & 0x33333333) + ((x >> 2) & 0x33333333)
   return byte((((x + (x >> 4)) & 0x0F0F0F0F) * 0x01010101) >> 24)
 }
 
-func ipopcount(x, offset uint) byte {
-  var mask uint = 0xFFFFFFFF << (32 - offset)
+func ipopcount(x, offset uint32) byte {
+  var mask uint32 = 0xFFFFFFFF << (32 - offset)
   return popcount(x & mask)
 }
 
-func idxMask(hash, shift uint) (uint, uint) {
-  var idx, mask uint
+func idxMask(hash, shift uint32) (uint32, uint32) {
+  var idx, mask uint32
   idx = (hash >> shift) & 31
   mask = 0x80000000 >> idx
   return idx, mask
 }
 
 type hamtNode struct {
-  index uint
+  index uint32
   kids []INode
 }
 
 type hamtNodeIterator struct {
-  index uint
+  index uint32
   kids *[]INode
 }
 
 func (hni *hamtNodeIterator) HasNext() bool {
-  return hni.index < uint(len(*hni.kids))
+  return hni.index < uint32(len(*hni.kids))
 }
 
 func (hni *hamtNodeIterator) Next() INode {
@@ -67,7 +66,7 @@ func (node *hamtNode) Nodes() NodeIterator {
   return &ret
 }
 
-func (node *hamtNode) EntryAt(key IObj, hash, shift uint) *Entry {
+func (node *hamtNode) EntryAt(key IObj, hash, shift uint32) *Entry {
   idx, mask := idxMask(hash, shift)
   
   if mask & node.index > 0 {
@@ -80,7 +79,7 @@ func (node *hamtNode) EntryAt(key IObj, hash, shift uint) *Entry {
   }
 }
 
-func withoutKidAt(node *hamtNode, pos byte, mask uint) *hamtNode {
+func withoutKidAt(node *hamtNode, pos byte, mask uint32) *hamtNode {
   if len(node.kids) == 1 {
     return nil
   } else {
@@ -104,7 +103,7 @@ func replaceKidAt(node *hamtNode, newKid INode, pos byte) *hamtNode {
   return newNode
 }
 
-func (node *hamtNode) Without(key IObj, hash, shift uint) (INode, bool) {
+func (node *hamtNode) Without(key IObj, hash, shift uint32) (INode, *Entry) {
   idx, mask := idxMask(hash, shift)
 
   if mask & node.index > 0 {
@@ -112,14 +111,14 @@ func (node *hamtNode) Without(key IObj, hash, shift uint) (INode, bool) {
 
     pos := ipopcount(node.index, idx)
 
-    result, decCount := node.kids[pos].Without(key, hash, shift + 5)
+    result, removed := node.kids[pos].Without(key, hash, shift + 5)
 
-    if decCount {
+    if removed != nil {
       // if something was actually removed
       if result == nil {
         switch len(node.kids) {
         case 1:
-          return nil, true
+          return nil, removed
         case 2:
           goodKidPos := pos ^ 1
           _, dontGetFancy := node.kids[goodKidPos].(*hamtNode)
@@ -127,11 +126,11 @@ func (node *hamtNode) Without(key IObj, hash, shift uint) (INode, bool) {
             // if this node only has one kid left which is not another
             // hamtNode, then we can get fancy and just return the remaining
             // kid since it doesn't use bitfiddling to figure out what's where.
-            return node.kids[goodKidPos], true
+            return node.kids[goodKidPos], removed
           }
           fallthrough
         default:
-          return withoutKidAt(node, pos, mask), true
+          return withoutKidAt(node, pos, mask), removed
         }
       } else {
         if len(node.kids) == 1 {
@@ -140,17 +139,17 @@ func (node *hamtNode) Without(key IObj, hash, shift uint) (INode, bool) {
             // if this node only has one kid, and the result is not another
             // hamtNode, then we can get fancy and just return the result node
             // since it doesn't use bitfiddling to figure out what's where.
-            return result, true
+            return result, removed
           }
         }
-        return replaceKidAt(node, result, pos), true
+        return replaceKidAt(node, result, pos), removed
       } 
     } 
   } 
-  return node, false
+  return node, nil
 }
 
-func (node *hamtNode) With(entry *Entry, hash, shift uint) (INode, bool) {
+func (node *hamtNode) With(entry *Entry, hash, shift uint32) (INode, *Entry) {
   idx, mask := idxMask(hash, shift)
 
   pos := ipopcount(node.index, idx)
@@ -162,13 +161,13 @@ func (node *hamtNode) With(entry *Entry, hash, shift uint) (INode, bool) {
     newKids := make([]INode, len(node.kids))
     copy(newKids, node.kids) 
 
-    newKid, incCount := newKids[pos].With(entry, hash, shift + 5)
+    newKid, replaced := newKids[pos].With(entry, hash, shift + 5)
 
     newKids[pos] = newKid
 
     newNode := hamtNode{node.index, newKids}
 
-    return &newNode, incCount
+    return &newNode, replaced
 
   } else {
     // D'oh! This hamtnode doesn't already have a key whose hash has the same
@@ -182,18 +181,18 @@ func (node *hamtNode) With(entry *Entry, hash, shift uint) (INode, bool) {
     newKids[pos] = entry
 
     newNode := hamtNode{mask | node.index, newKids}
-    return &newNode, true
+    return &newNode, nil
   }
 }
 
 // this thing should only be called when the hashes are different
-func distinguishingNode(e1, e2 INode, h1, h2, shift uint) *hamtNode {
+func distinguishingNode(e1, e2 INode, h1, h2, shift uint32) *hamtNode {
   // oh dang, only the first shift-5 bits of h1 and h2 are the same.
   // so we're gonna have to create and return a new hamtnode (possibly nested)
   // to deal with that. Bummer
   newNode := new(hamtNode)
   maybeSubNewNode := newNode
-  var mask1, mask2 uint
+  var mask1, mask2 uint32
 
   mask1 = 1 << (32 - ((h1 >> shift) & 31))
   mask2 = 1 << (32 - ((h2 >> shift) & 31))

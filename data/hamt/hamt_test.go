@@ -9,11 +9,13 @@ import . "clojang/data/interfaces"
 
 type mock struct {
   val interface{}
-  hash uint
+  hash uint32
 }
 
-func (m *mock) Write(w bufio.Writer) {
+func (m *mock) Write(w *bufio.Writer) error {
+  return nil
 }
+
 
 
 func (m *mock) Equals(o IObj) bool {
@@ -21,8 +23,11 @@ func (m *mock) Equals(o IObj) bool {
   return ok && v.val == m.val
 }
 
+func (m *mock) Type() uint32 {
+  return 0
+}
 
-func (m *mock) Hash() uint {
+func (m *mock) Hash() uint32 {
   return m.hash
 }
 
@@ -32,7 +37,7 @@ func (m *mock) String() string {
 
 
 
-func newMock(val interface{}, hash uint) *mock {
+func newMock(val interface{}, hash uint32) *mock {
   m := mock{val, hash}
   return &m
 }
@@ -84,8 +89,8 @@ func TestEntry (t *testing.T) {
 }
 
 func TestDistinguish (t *testing.T) {
-  var n1 uint = 0x3FFFFFFF // 0b0011111.... so 0 when we get to the last level
-  var n2 uint = 0x7FFFFFFF // 0b01111111... so 1 when we get to the last level
+  var n1 uint32 = 0x3FFFFFFF // 0b0011111.... so 0 when we get to the last level
+  var n2 uint32 = 0x7FFFFFFF // 0b01111111... so 1 when we get to the last level
   e1 := NewEntry(newMock("hello", n1), newMock("yo", 4))
   e2 := NewEntry(newMock("hey", n2), newMock("there", 5))
 
@@ -117,10 +122,10 @@ func TestDistinguish (t *testing.T) {
 }
 
 func TestPopcount (t *testing.T) {
-  var v1 uint = 1 // expect 1
-  var v2 uint = 65 // expect 2
-  var v3 uint = 0x10000000 // expect 1
-  var v4 uint = 0xFF000000 // expect 8
+  var v1 uint32 = 1 // expect 1
+  var v2 uint32 = 65 // expect 2
+  var v3 uint32 = 0x10000000 // expect 1
+  var v4 uint32 = 0xFF000000 // expect 8
 
   if popcount(v1) != 1 ||
      popcount(v2) != 2 ||
@@ -130,10 +135,10 @@ func TestPopcount (t *testing.T) {
       t.Fail()
   }
 
-  var v5 uint = 0xFFFFFFFF
+  var v5 uint32 = 0xFFFFFFFF
   var i byte
   for i=0;i<32;i++ {
-    if ipopcount(v5, uint(i)) != i {
+    if ipopcount(v5, uint32(i)) != i {
       t.Log("ipopcount is doing weird stuff")
       t.Fail()
     }
