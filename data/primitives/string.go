@@ -52,6 +52,10 @@ func (s *String) Type() uint32 {
   return types.StringID
 }
 
+func (s *String) Name() string {
+  return s.string
+}
+
 
 func NewString(s string) *String {
   ret := String{s, 0}
