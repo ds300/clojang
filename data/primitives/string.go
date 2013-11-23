@@ -10,7 +10,6 @@ package primitives
 
 import . "clojang/data/interfaces"
 import "clojang/data/types"
-import "bufio"
 import "strconv"
 
 type String struct {
@@ -43,7 +42,7 @@ func (s *String) Equals(other IObj) bool {
   return ok && v.string == s.string
 }
 
-func (s *String) Write(w *bufio.Writer) error {
+func (s *String) Write(w IStringWriter) error {
   _, err := w.WriteString(strconv.Quote(s.string))
   return err
 }

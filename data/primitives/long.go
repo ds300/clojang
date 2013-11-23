@@ -12,7 +12,6 @@ import . "clojang/data/interfaces"
 import "clojang/data/types"
 import "fmt"
 import "errors"
-import "bufio"
 
 type Long int64
 
@@ -35,7 +34,7 @@ func (l Long) Equals(other IObj) bool {
   }
 }
 
-func (l Long) Write(w *bufio.Writer) error {
+func (l Long) Write(w IStringWriter) error {
   _, err := w.WriteString(l.String())
   return err
 }

@@ -6,10 +6,10 @@
 // the terms of this license.
 // You must not remove this notice, or any other, from this software.
 
-package coll
+package vec
 
 import "fmt"
-import "clojang/data/interfaces"
+import . "clojang/data/interfaces"
 import "clojang/data/types"
 import "bufio"
 import "bytes"
@@ -17,7 +17,7 @@ import "bytes"
 // String() string
 // Hash() uint
 // Equals(other IObj) bool
-// Write(w bufio.Writer) error
+// Write(w IStringWriter) error
 // Type() uint
 // Count() uint
 // Seq() ISeq
@@ -51,7 +51,7 @@ func (ev emptyVector) Equals(other IObj) bool {
   return ok
 }
 
-func (ev emptyVector) Write(w bufio.Writer) error {
+func (ev emptyVector) Write(w IStringWriter) error {
   w.WriteString("")
 }
 
@@ -118,7 +118,7 @@ func (sev *singleElemVector) Equals(other IObj) bool {
 }
 
 
-func (sev *singleElemVector) Write(w bufio.Writer) error {
+func (sev *singleElemVector) Write(w IStringWriter) error {
   w.WriteRune('[')
   if sev.IObj == nil {
     w.WriteString("nil")

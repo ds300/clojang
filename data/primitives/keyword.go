@@ -10,7 +10,6 @@ package primitives
 
 import . "clojang/data/interfaces"
 import "clojang/data/types"
-import "bufio"
 
 type keyword struct {
   ns string
@@ -42,7 +41,7 @@ func (k *keyword) Equals(other IObj) bool {
    return ok && k.name == v.name && k.ns == v.ns
 }
 
-func (k *keyword) Write(w *bufio.Writer) error {
+func (k *keyword) Write(w IStringWriter) error {
   _, err := w.WriteString(k.String())
   return err
 }

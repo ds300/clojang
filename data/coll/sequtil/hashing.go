@@ -6,40 +6,33 @@
 // the terms of this license.
 // You must not remove this notice, or any other, from this software.
 
-package primitives
+package sequtil
 
 import . "clojang/data/interfaces"
-import "clojang/data/types"
 
-type Bool bool
+var mersenneNumbers [5]uint32 = [5]uint32{5, 7, 13, 17, 19}
 
+func HashIndexed(index, hash uint32) uint32 {
+  return ((hash << mersenneNumbers[index % 5]) - hash)
+}
 
-func (b Bool) String() string {
-  if b {
-    return "true"
-  } else {
-    return "false"
+const nilhash = 329837298
+
+func HashSeq(seq ISeq) uint32 {
+  i := uint32(0)
+
+  hash := uint32(5843)
+
+  for seq.Seq() != nil {
+    val := seq.First()
+    if val == nil {
+      hash += HashIndexed(i, nilhash)
+    } else {
+      hash += HashIndexed(i, val.Hash())
+    }
+    i++
+    seq = seq.Rest()
   }
-}
 
-func (b Bool) Hash() uint32 {
-  if b {
-    return 2
-  } else {
-    return 1
-  }
-}
-
-func (b Bool) Equals(other IObj) bool {
-  v, ok := other.(Bool)
-  return ok && v == b
-}
-
-func (b Bool) Write(w IStringWriter) error {
-  _, err := w.WriteString(b.String())
-  return err
-}
-
-func (b Bool) Type() uint32 {
-  return types.BoolID
+  return hash
 }

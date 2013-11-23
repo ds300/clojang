@@ -10,7 +10,6 @@ package primitives
 
 import . "clojang/data/interfaces"
 import "clojang/data/types"
-import "bufio"
 
 type symbol struct {
   ns string
@@ -43,7 +42,7 @@ func (s *symbol) Equals(other IObj) bool {
    return ok && s.name == v.name && s.ns == v.ns
 }
 
-func (s *symbol) Write(w *bufio.Writer) error {
+func (s *symbol) Write(w IStringWriter) error {
   _, err := w.WriteString(s.String())
   return err
 }

@@ -6,40 +6,28 @@
 // the terms of this license.
 // You must not remove this notice, or any other, from this software.
 
-package primitives
+package sequtil
 
 import . "clojang/data/interfaces"
-import "clojang/data/types"
 
-type Bool bool
+func WriteSeq(w IStringWriter, leftDelim rune, seq ISeq, rightDelim rune) error {
+  _, err := w.WriteRune(leftDelim)
 
+  seq = seq.Seq()
+  for err == nil && seq != nil {
+    val := seq.First()
+    if val == nil {
+      _, err = w.WriteString("nil")
+    } else {
+      err = val.Write(w)
+    }
 
-func (b Bool) String() string {
-  if b {
-    return "true"
-  } else {
-    return "false"
+    seq = seq.Rest().Seq()
+    if err == nil && seq != nil {
+      _, err = w.WriteRune(' ')
+    }
   }
-}
 
-func (b Bool) Hash() uint32 {
-  if b {
-    return 2
-  } else {
-    return 1
-  }
-}
-
-func (b Bool) Equals(other IObj) bool {
-  v, ok := other.(Bool)
-  return ok && v == b
-}
-
-func (b Bool) Write(w IStringWriter) error {
-  _, err := w.WriteString(b.String())
+  _, err = w.WriteRune(rightDelim)
   return err
-}
-
-func (b Bool) Type() uint32 {
-  return types.BoolID
 }

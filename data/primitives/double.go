@@ -12,7 +12,6 @@ import . "clojang/data/interfaces"
 import "clojang/data/types"
 import "fmt"
 import "errors"
-import "bufio"
 
 type Double float64
 
@@ -35,7 +34,7 @@ func (d Double) Equals(other IObj) bool {
   }
 }
 
-func (d Double) Write(w *bufio.Writer) error {
+func (d Double) Write(w IStringWriter) error {
   _, err := w.WriteString(d.String())
   return err
 }

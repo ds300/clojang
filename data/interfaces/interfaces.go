@@ -7,15 +7,19 @@
 // You must not remove this notice, or any other, from this software.
 
 package interfaces
-import "bufio"
 
 type IObj interface {
   String() string
   Hash() uint32
   Equals(other IObj) bool
   // for serializing
-  Write(w *bufio.Writer) error
+  Write(w IStringWriter) error
   Type() uint32
+}
+
+type IStringWriter interface {
+  WriteString(s string) (int, error)
+  WriteRune(r rune) (int, error)
 }
 
 type IMeta interface {
@@ -43,7 +47,7 @@ type ISeq interface {
   ISeqable
   First() IObj
   Rest() ISeq
-  Nth() (ISeq, error)
+  Nth(i uint32) (IObj, error)
 }
 
 type IReversible interface {
@@ -57,10 +61,11 @@ type ISeqable interface {
 
 type IColl interface {
   ICounted
+  ISeqable
   Conj(o IObj) IColl
-  Contains(o IObj) bool
-  ValAt(k IObj) IObj
-  ValAtOr(k, notFount IObj) IObj
+  // Contains(o IObj) bool
+  // ValAt(k IObj) IObj
+  // ValAtOr(k, notFound IObj) IObj
 }
 
 type IAssoc interface {
@@ -70,7 +75,6 @@ type IAssoc interface {
 
 type IMap interface {
   IAssoc
-  ISeqable
   EntryAt(k IObj) IMapEntry
   EntryAtOr(k, notFound IObj) IMapEntry
   Dissoc(k IObj) IAssoc
@@ -89,7 +93,6 @@ type ISet interface {
 
 type IVector interface {
   IAssoc
-  ISeqable
 }
 
 type IFn interface {
