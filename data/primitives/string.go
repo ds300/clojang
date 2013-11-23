@@ -15,19 +15,19 @@ import "strconv"
 
 type String struct {
   string
-  hash uint
+  hash uint32
 }
 
 func (s *String) String() string {
   return s.string
 }
 
-func (s *String) Hash() uint {
+func (s *String) Hash() uint32 {
   // djb2, maybe terribly implemented
   if s.hash == 0 {
-    var hash uint = 5381
+    var hash uint32 = 5381
     for _, c := range s.string {
-      hash = ((hash << 5) + hash) + uint(c)
+      hash = ((hash << 5) + hash) + uint32(c)
     }
     if hash == 0 {
       hash = 1
@@ -43,12 +43,12 @@ func (s *String) Equals(other IObj) bool {
   return ok && v.string == s.string
 }
 
-func (s *String) Write(w bufio.Writer) error {
+func (s *String) Write(w *bufio.Writer) error {
   _, err := w.WriteString(strconv.Quote(s.string))
   return err
 }
 
-func (s *String) Type() uint {
+func (s *String) Type() uint32 {
   return types.StringID
 }
 

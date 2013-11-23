@@ -10,8 +10,12 @@ package types
 // import "fmt"
 // import "strconv"
 
-const StringID uint = 0
-const VectorID uint = 1
+const (
+  LongID uint32 = iota
+  DoubleID uint32 = iota
+  StringID uint32 = iota
+  VectorID uint32 = iota
+)
 
 
 // type List struct {

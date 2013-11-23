@@ -13,4 +13,11 @@ func TestString(t *testing.T) {
     t.Log("Strings which should be equal are not equal", s1, s3)
     t.Fail()
   }
+
+  long := Long(54)
+  double := Double(1.1)
+
+  double2 := long.Mult(double)
+
+  t.Log("les double2 ist", double2)
 }

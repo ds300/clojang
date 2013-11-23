@@ -11,22 +11,30 @@ import "bufio"
 
 type IObj interface {
   String() string
-  Hash() uint
+  Hash() uint32
   Equals(other IObj) bool
   // for serializing
-  Write(w bufio.Writer) error
-  Type() uint
+  Write(w *bufio.Writer) error
+  Type() uint32
+}
+
+type INumeric interface {
+  Mult(other INumeric) INumeric
+  Div(other INumeric) (INumeric, error)
+  Plus(other INumeric) INumeric
+  Sub(other INumeric) INumeric
+  Mod(other INumeric) (INumeric, error)
 }
 
 type ICounted interface {
-  Count() uint
+  Count() uint32
 }
 
 type ISeq interface {
   ISeqable
   First() IObj
   Rest() ISeq
-  Nth() ISeq, error
+  Nth() (ISeq, error)
 }
 
 type IReversible interface {
@@ -48,15 +56,15 @@ type IColl interface {
 
 type IAssoc interface {
   IColl
-  Assoc(k IObj, v IObj) IAssoc
-  Dissoc(k IObj) IAssoc
-  EntryAt(k IObj) IMapEntry
-  EntryAtOr(k, notFound IObj) IMapEntry
+  Assoc(k IObj, v IObj) (IAssoc, error)
 }
 
 type IMap interface {
   IAssoc
   ISeqable
+  EntryAt(k IObj) IMapEntry
+  EntryAtOr(k, notFound IObj) IMapEntry
+  Dissoc(k IObj) IAssoc
 }
 
 type IMapEntry interface {
