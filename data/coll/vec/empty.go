@@ -12,6 +12,7 @@ import . "clojang/data/interfaces"
 import "clojang/data/types"
 import "clojang/data/coll/list"
 import "clojang/data/primitives"
+import "errors"
 
 type emptyVector struct {}
 
@@ -19,7 +20,7 @@ func (ev emptyVector) String() string {
   return "[]"
 }
 
-func (ev emptyVector) Hash() uint {
+func (ev emptyVector) Hash() uint32 {
   return 1
 }
 
@@ -33,20 +34,20 @@ func (ev emptyVector) Write(w IStringWriter) error {
   return err
 }
 
-func (ev emptyVector) Type() uint {
+func (ev emptyVector) Type() uint32 {
   return types.VectorID
 }
 
-func (ev emptyVector) Count() uint {
+func (ev emptyVector) Count() uint32 {
   return 0
 }
 
 func (ev emptyVector) Seq() ISeq {
-  return List.EmptyList{}
+  return list.EmptyList{}
 }
 
 func (ev emptyVector) RSeq() ISeq {
-  return List.EmptyList{}
+  return list.EmptyList{}
 }
 
 func (ev emptyVector) Conj(o IObj) IColl {
@@ -59,12 +60,12 @@ func (ev emptyVector) Contains(o IObj) bool {
 }
 
 func (ev emptyVector) Assoc(k IObj, v IObj) (IAssoc, error) {
-  v, ok := k.(primitives.Long)
+  i, ok := k.(primitives.Long)
   if ok {
-    if v == 0 {
-      return ev.Conj(v), nil
+    if i == 0 {
+      return ev.Conj(v).(IVector), nil
     } else {
-      return nil, errors.New("Index out of bounds" + k.String())
+      return nil, errors.New("Index out of bounds" + i.String())
     }
   } else {
     return nil, errors.New("Bad index type")

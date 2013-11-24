@@ -34,5 +34,9 @@ func HashSeq(seq ISeq) uint32 {
     seq = seq.Rest()
   }
 
+  if hash == 0 {
+    hash = 1
+  }
+
   return hash
 }

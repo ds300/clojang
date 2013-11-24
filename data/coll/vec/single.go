@@ -14,19 +14,24 @@ import "clojang/data/coll/list"
 import "clojang/data/primitives"
 import "clojang/data/coll/sequtil"
 import "bytes"
+import "errors"
 
 type singleElemVector struct {
   elem IObj
+  hash uint32
 }
 
 func (sev *singleElemVector) String() string {
   var buf bytes.Buffer
-  sev.Write(buf)
+  sev.Write(&buf)
   return buf.String()
 }
 
 func (sev *singleElemVector) Hash() uint32 {
-  return sequtil.HashIndexed(0, sev.elem.Hash())
+  if sev.hash == 0 {
+    sev.hash = sequtil.HashSeq(sev.Seq())
+  }
+  return sev.hash
 }
 
 func (sev *singleElemVector) Equals(other IObj) bool {
@@ -62,19 +67,18 @@ func (sev *singleElemVector) RSeq() ISeq {
 }
 
 func (sev *singleElemVector) Conj(o IObj) IColl {
-  return tupleVector{sev.elem, o}
+  return &tupleVector{sev.elem, o, 0}
 }
 
 func (sev *singleElemVector) Assoc(k IObj, v IObj) (IAssoc, error) {
-  v, ok := k.(primitives.Long)
+  i, ok := k.(primitives.Long)
   if ok {
-    switch int64(v) {
+    switch int64(i) {
     case 0:
-      newSev := singleElemVector{v}
+      newSev := singleElemVector{v, 0}
       return &newSev, nil
     case 1:
-      tuple := tupleVector{sev.elem, v, 0}
-      return &tuple
+      return sev.Conj(v).(IVector), nil
     default:
       return nil, errors.New("Index out of bounds: " + v.String())
     }

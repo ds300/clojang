@@ -8,11 +8,11 @@
 
 package vec
 
-import "fmt"
-import . "clojang/data/interfaces"
-import "clojang/data/types"
-import "bufio"
-import "bytes"
+// import "fmt"
+// import . "clojang/data/interfaces"
+// import "clojang/data/types"
+// import "bufio"
+// import "bytes"
 
 // String() string
 // Hash() uint32
@@ -27,11 +27,5 @@ import "bytes"
 // Get(k IObj) IObj
 // GetOr(k, notFound IObj) IObj
 // Contains(o IObj) bool
-
-
-type singleElemVector struct {
-  IObj
-  hash uint
-}
 
 
