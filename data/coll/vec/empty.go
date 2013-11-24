@@ -64,7 +64,7 @@ func (ev emptyVector) Assoc(k IObj, v IObj) (IAssoc, error) {
     if i == 0 {
       return ev.Conj(v).(IVector), nil
     } else {
-      return nil, errors.New("Index out of bounds" + i.String())
+      return nil, errors.New("Index out of bounds " + i.String())
     }
   } else {
     return nil, errors.New("Bad index type")
