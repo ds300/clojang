@@ -22,6 +22,7 @@ const (
   MapID uint32 = iota 
   SetID uint32 = iota
   RegexID uint32 = iota
+  LazySeqID uint32 = iota
 )
 
 

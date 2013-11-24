@@ -1,14 +1,16 @@
-package coll
+package lazy
 
 import "testing"
 import . "clojang/data/interfaces"
+import "clojang/data/coll/list"
+import "clojang/data/primitives"
 
 func take (n uint, seq ISeq) ISeq {
   if n==0 || seq == nil {
     return nil
   } else {
     return LazySeq(func () ISeq {
-      return Cons(seq.First(), take(n-1, seq.Rest()))
+      return list.Cons(seq.First(), take(n-1, seq.Rest()))
     })
   }
 }
@@ -16,7 +18,7 @@ func take (n uint, seq ISeq) ISeq {
 
 func naturalIntegers (from uint) ISeq {
   return LazySeq(func () ISeq {
-    return Cons(mock(from, from), naturalIntegers(from+1))
+    return list.Cons(primitives.Long(from), naturalIntegers(from+1))
   })
 }
 
@@ -29,7 +31,7 @@ func TestLazy (t *testing.T) {
 
   head := seq
 
-  for seq != nil {
+  for seq.Seq() != nil {
     t.Log(seq.First())
     seq = seq.Rest()
   }

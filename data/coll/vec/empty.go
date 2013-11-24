@@ -10,7 +10,6 @@ package vec
 
 import . "clojang/data/interfaces"
 import "clojang/data/types"
-import "clojang/data/coll/list"
 import "clojang/data/primitives"
 import "errors"
 
@@ -25,8 +24,8 @@ func (ev emptyVector) Hash() uint32 {
 }
 
 func (ev emptyVector) Equals(other IObj) bool {
-  _, ok := other.(emptyVector)
-  return ok
+  seq, ok := other.(ISeqable)
+  return ok && seq.Seq() == nil
 }
 
 func (ev emptyVector) Write(w IStringWriter) error {
@@ -43,11 +42,11 @@ func (ev emptyVector) Count() uint32 {
 }
 
 func (ev emptyVector) Seq() ISeq {
-  return list.EmptyList{}
+  return nil
 }
 
 func (ev emptyVector) RSeq() ISeq {
-  return list.EmptyList{}
+  return nil
 }
 
 func (ev emptyVector) Conj(o IObj) IColl {
@@ -80,4 +79,11 @@ func (ev emptyVector) GetOr(k, notFound IObj) IObj {
   return notFound
 }
 
+func (ev emptyVector) Peek() IObj {
+  return nil
+}
+
+func (ev emptyVector) Pop() IStack, error {
+  return nil, errors.New("can't peek at an empty stack")
+}
 

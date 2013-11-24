@@ -35,8 +35,8 @@ func (sev *singleElemVector) Hash() uint32 {
 }
 
 func (sev *singleElemVector) Equals(other IObj) bool {
-  seq, ok := other.(ISeq)
-  return ok && sequtil.Equals(sev.Seq(),seq)
+  seq, ok := other.(ISeqable)
+  return ok && sequtil.Equals(sev.Seq(),seq.Seq())
 }
 
 func (sev *singleElemVector) Write(w IStringWriter) error {
@@ -80,7 +80,7 @@ func (sev *singleElemVector) Assoc(k IObj, v IObj) (IAssoc, error) {
     case 1:
       return sev.Conj(v).(IVector), nil
     default:
-      return nil, errors.New("Index out of bounds: " + v.String())
+      return nil, errors.New("Index out of bounds: " + k.String())
     }
   }
   return nil, errors.New("Bad index type")
@@ -108,3 +108,14 @@ func (sev *singleElemVector) Contains(o IObj) bool {
   v, ok := o.(primitives.Long)
   return ok && v == 0
 }
+
+func (sev *singleElemVector) Peek() IObj {
+  return sev.elem
+}
+
+func (sev *singleElemVector) Pop() IStack, error {
+  return emptyVector{}, nil
+}
+
+
+

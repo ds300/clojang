@@ -60,3 +60,12 @@ func (_ EmptyList) Conj(o IObj) IColl {
 func (_ EmptyList) Count() uint32 {
   return 0
 }
+
+
+func (ls EmptyList) Peek() IObj {
+  return nil
+}
+
+func (ls EmptyList) Pop() (IStack, error) {
+  return nil, errors.New("Can't pop empty list")
+}

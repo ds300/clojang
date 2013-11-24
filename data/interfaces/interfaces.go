@@ -92,6 +92,11 @@ type ISet interface {
   Disj(o IObj) IColl
 }
 
+type IStack interface {
+  Peek() IObj
+  Pop() (IStack, error)
+}
+
 
 type IVector interface {
   IAssoc

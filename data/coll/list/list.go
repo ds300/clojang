@@ -21,6 +21,15 @@ type list struct {
   rest ISeq
 }
 
+func Cons(val IObj, seq ISeq) *list {
+  if seq == nil {
+    seq = EmptyList{}
+  }
+
+  ls := list{0, 0, val, seq}
+  return &ls
+}
+
 func (ls *list) String() string {
   var buf bytes.Buffer
   ls.Write(&buf)
@@ -38,8 +47,8 @@ func (ls *list) Hash() uint32 {
 }
 
 func (ls *list) Equals(other IObj) bool {
-  seq, ok := other.(ISeq)
-  return ok && seq.Seq() == nil
+  seq, ok := other.(ISeqable)
+  return ok && sequtil.Equals(ls, seq.Seq())
 }
 
 func (ls *list) Write(w IStringWriter) error {
@@ -90,11 +99,10 @@ func (ls *list) Count() uint32 {
   return ls.count
 }
 
-func Cons(val IObj, seq ISeq) *list {
-  if seq == nil {
-    seq = EmptyList{}
-  }
+func (ls *list) Peek() IObj {
+  return ls.First()
+}
 
-  ls := list{0, 0, val, seq}
-  return &ls
+func (ls *list) Pop() (IStack, error) {
+  return ls.Rest().(IStack), nil
 }

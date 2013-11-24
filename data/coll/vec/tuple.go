@@ -36,8 +36,8 @@ func (tv *tupleVector) Hash() uint32 {
 }
 
 func (tv *tupleVector) Equals(other IObj) bool {
-  seq, ok := other.(ISeq)
-  return ok && sequtil.Equals(tv.Seq(),seq)
+  seq, ok := other.(ISeqable)
+  return ok && sequtil.Equals(tv.Seq(),seq.Seq())
 }
 
 func (tv *tupleVector) Write(w IStringWriter) error {
@@ -121,3 +121,15 @@ func (tv *tupleVector) Key() IObj {
 func (tv *tupleVector) Val() IObj {
   return tv.v
 }
+
+
+func (tv *tupleVector) Peek() IObj {
+  return tv.v
+}
+
+func (tv *tupleVector) Pop() IStack, error {
+  return &singleElemVector{tv.k, 0}
+}
+
+
+
