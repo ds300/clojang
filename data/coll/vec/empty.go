@@ -8,12 +8,10 @@
 
 package vec
 
-import "fmt"
 import . "clojang/data/interfaces"
 import "clojang/data/types"
-import "bufio"
-
-const emptyVectorHash = 342908439
+import "clojang/data/coll/list"
+import "clojang/data/primitives"
 
 type emptyVector struct {}
 
@@ -44,7 +42,11 @@ func (ev emptyVector) Count() uint {
 }
 
 func (ev emptyVector) Seq() ISeq {
-  return 
+  return List.EmptyList{}
+}
+
+func (ev emptyVector) RSeq() ISeq {
+  return List.EmptyList{}
 }
 
 func (ev emptyVector) Conj(o IObj) IColl {
@@ -56,15 +58,25 @@ func (ev emptyVector) Contains(o IObj) bool {
   return false
 }
 
-func (ev emptyVector) ValAt(k IObj) IObj {
+func (ev emptyVector) Assoc(k IObj, v IObj) (IAssoc, error) {
+  v, ok := k.(primitives.Long)
+  if ok {
+    if v == 0 {
+      return ev.Conj(v), nil
+    } else {
+      return nil, errors.New("Index out of bounds" + k.String())
+    }
+  } else {
+    return nil, errors.New("Bad index type")
+  }
+}
+
+func (ev emptyVector) Get(k IObj) IObj {
   return nil
 }
 
-func (ev emptyVector) ValAtOr(k, notFound IObj) IObj {
+func (ev emptyVector) GetOr(k, notFound IObj) IObj {
   return notFound
 }
 
-func (ev emptyVector) Assoc(k IObj, v IObj) IAssoc, error {
-
-}
 

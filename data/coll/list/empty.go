@@ -20,7 +20,7 @@ func (_ EmptyList) String() string {
 }
 
 func (_ EmptyList) Hash() uint32 {
-  return 498234938
+  return 1
 }
 
 func (_ EmptyList) Equals(other IObj) bool {

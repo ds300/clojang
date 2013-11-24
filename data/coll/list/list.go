@@ -98,4 +98,3 @@ func Cons(val IObj, seq ISeq) *list {
   ls := list{0, 0, val, seq}
   return &ls
 }
-

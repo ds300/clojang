@@ -63,9 +63,12 @@ type IColl interface {
   ICounted
   ISeqable
   Conj(o IObj) IColl
-  // Contains(o IObj) bool
-  // ValAt(k IObj) IObj
-  // ValAtOr(k, notFound IObj) IObj
+}
+
+type ILookup interface {
+  Get(k IObj) IObj
+  GetOr(k, notFound IObj) IObj
+  Contains(o IObj) bool
 }
 
 type IAssoc interface {
@@ -75,9 +78,8 @@ type IAssoc interface {
 
 type IMap interface {
   IAssoc
-  EntryAt(k IObj) IMapEntry
-  EntryAtOr(k, notFound IObj) IMapEntry
-  Dissoc(k IObj) IAssoc
+  ILookup
+  Dissoc(k IObj) IMap
 }
 
 type IMapEntry interface {
@@ -93,6 +95,7 @@ type ISet interface {
 
 type IVector interface {
   IAssoc
+  ILookup
 }
 
 type IFn interface {
