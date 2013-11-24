@@ -113,7 +113,7 @@ func (sev *singleElemVector) Peek() IObj {
   return sev.elem
 }
 
-func (sev *singleElemVector) Pop() IStack, error {
+func (sev *singleElemVector) Pop() (IStack, error) {
   return emptyVector{}, nil
 }
 

@@ -83,7 +83,7 @@ func (ev emptyVector) Peek() IObj {
   return nil
 }
 
-func (ev emptyVector) Pop() IStack, error {
+func (ev emptyVector) Pop() (IStack, error) {
   return nil, errors.New("can't peek at an empty stack")
 }
 

@@ -127,8 +127,8 @@ func (tv *tupleVector) Peek() IObj {
   return tv.v
 }
 
-func (tv *tupleVector) Pop() IStack, error {
-  return &singleElemVector{tv.k, 0}
+func (tv *tupleVector) Pop() (IStack, error) {
+  return &singleElemVector{tv.k, 0}, nil
 }
 
 

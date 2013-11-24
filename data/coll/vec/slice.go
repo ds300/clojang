@@ -15,22 +15,22 @@ import "clojang/data/coll/sequtil"
 import "clojang/data/coll/lazy"
 import "clojang/data/coll/list"
 import "bytes"
+import "errors"
 
-
-func SliceSeq(slice *[]IObj, index int32) ISeq {
-  if index < len(slice) {
+func SliceSeq(slice *[]IObj, index int) ISeq {
+  if index < len(*slice) {
     return lazy.LazySeq(func () ISeq {
-      return list.Cons(slice[index], sliceSeq(slice, index + 1))   
+      return list.Cons((*slice)[index], SliceSeq(slice, index + 1))   
     })
   } else {
     return nil
   }
 }
 
-func RSliceSeq(slice *[]IObj, index int32) ISeq {
+func RSliceSeq(slice *[]IObj, index int) ISeq {
   if index >= 0 {
     return lazy.LazySeq(func () ISeq {
-      return list.Cons(slice[index], sliceSeq(slice, index - 1))   
+      return list.Cons((*slice)[index], RSliceSeq(slice, index - 1))   
     })
   } else {
     return nil
@@ -90,8 +90,9 @@ func (sv *sliceVector) Conj(o IObj) IColl {
 }
 
 func (sv *sliceVector) Assoc(k IObj, v IObj) (IAssoc, error) {
-  i, ok := k.(primitives.Long)
+  l, ok := k.(primitives.Long)
   if ok {
+    i := int(l)
     if i > 0 && i < len(sv.slice) {
       newSlice := make([]IObj, len(sv.slice))
       copy(newSlice, sv.slice)
@@ -109,8 +110,8 @@ func (sv *sliceVector) Assoc(k IObj, v IObj) (IAssoc, error) {
 
 func (sv *sliceVector) Get(k IObj) IObj {
   i, ok := k.(primitives.Long)
-  if ok && i >= 0 && i < len(sv.slice) {
-    return sv.slice[i]
+  if ok && int(i) >= 0 && int(i) < len(sv.slice) {
+    return sv.slice[int(i)]
   } else {
     return nil
   }
@@ -118,23 +119,23 @@ func (sv *sliceVector) Get(k IObj) IObj {
 
 func (sv *sliceVector) GetOr(k, notFound IObj) IObj {
   i, ok := k.(primitives.Long)
-  if ok && i >= 0 && i < len(sv.slice) {
-    return sv.slice[i]
+  if ok && int(i) >= 0 && int(i) < len(sv.slice) {
+    return sv.slice[int(i)]
   } else {
     return notFound
   }
 }
 
 func (sv *sliceVector) Contains(o IObj) bool {
-  i, ok := k.(primitives.Long)
-  return ok && i >= 0 && i < len(sv.slice)
+  i, ok := o.(primitives.Long)
+  return ok && int(i) >= 0 && int(i) < len(sv.slice)
 }
 
 func (sv *sliceVector) Peek() IObj {
   return sv.slice[len(sv.slice) - 1]
 }
 
-func (sv *sliceVector) Pop() IStack, error {
+func (sv *sliceVector) Pop() (IStack, error) {
   switch len(sv.slice) {
   case 0:
     fallthrough
