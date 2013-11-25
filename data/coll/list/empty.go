@@ -41,8 +41,8 @@ func (_ EmptyList) First() IObj {
   return nil
 }
 
-func (_ EmptyList) Rest() ISeq {
-  return nil
+func (el EmptyList) Rest() ISeq {
+  return el
 }
 
 func (_ EmptyList) Nth(i uint32) (IObj, error) {

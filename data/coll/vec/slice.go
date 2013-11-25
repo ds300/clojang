@@ -86,6 +86,7 @@ func (sv *sliceVector) RSeq() ISeq {
 func (sv *sliceVector) Conj(o IObj) IColl {
   newSlice := make([]IObj, len(sv.slice) + 1)
   copy(newSlice, sv.slice)
+  newSlice[len(sv.slice)] = o
   return &sliceVector{newSlice, 0}
 }
 

@@ -61,7 +61,7 @@ func (tv *tupleVector) RSeq() ISeq {
 }
 
 func (tv *tupleVector) Conj(o IObj) IColl {
-  return nil
+  return &sliceVector{[]IObj{tv.k, tv.v, o}, 0}
 }
 
 func (tv *tupleVector) Assoc(k IObj, v IObj) (IAssoc, error) {

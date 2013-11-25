@@ -4,10 +4,11 @@ import "testing"
 import "clojang/data/primitives"
 import . "clojang/data/interfaces"
 
+
 func TestVec(t *testing.T) {
   var x IObj = emptyVector{}
 
-  t.Log("The empty vector looks like this: ", x.String())
+  getNil(t, x.(IVector), -2, -1, 0, 1, 2, 42374827, -34253465)
 
   x = x.(IVector).Conj(primitives.Long(43)).(IObj)
 
@@ -36,4 +37,28 @@ func TestVec(t *testing.T) {
   x = x.(IVector).Conj(primitives.NewString("Cheese")).(IObj)
 
   t.Log("Tuple vectors look like this: ", x.String())
+
+
+  x = x.(IVector).Conj(primitives.NewString("yo")).(IObj)
+
+  t.Log("Slice vectors look like this: ", x.String())
+
+  x = x.(IVector).Conj(primitives.NewString(`yo again!
+    `)).(IObj)
+
+  t.Log("Slice vectors grow man: ", x.String())
+}
+
+func getNil(t *testing.T, vec IVector, indices ...int) {
+  notFound := primitives.NewString("it wasn't found!")
+  for i := range indices {
+    if vec.Get(primitives.Long(i)) != nil {
+      t.Fail()
+      t.Log("Getting should return nill for index", i, "in vector", vec.(IObj).String())
+    }
+    if vec.GetOr(primitives.Long(i), notFound) != notFound {
+      t.Fail()
+      t.Log("Getting should return notFound for index", i, "in vector", vec.(IObj).String())
+    }
+  }
 }

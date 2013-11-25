@@ -50,7 +50,7 @@ func (ls *lazySeq) Rest() ISeq {
   if ls.cell != nil {
     return ls.cell.Rest()
   } else {
-    return nil
+    return ls
   }
 }
 

@@ -21,12 +21,15 @@ type list struct {
   rest ISeq
 }
 
-func Cons(val IObj, seq ISeq) *list {
-  if seq == nil {
-    seq = EmptyList{}
+func Cons(val IObj, seq ISeqable) *list {
+  var iseq ISeq
+  if seq == nil || seq.Seq() == nil {
+    iseq = EmptyList{}
+  } else {
+    iseq = seq.Seq()
   }
 
-  ls := list{0, 0, val, seq}
+  ls := list{0, 0, val, iseq}
   return &ls
 }
 
