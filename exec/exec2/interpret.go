@@ -3,6 +3,7 @@ package exec2
 import "fmt"
 import . "clojang/data/interfaces"
 import "clojang/data/primitives"
+import "clojang/data/coll/vec"
 import "errors"
 
 // const (
@@ -27,22 +28,42 @@ type stackFrame struct {
   depth int
   below *stackFrame
 }
+
+type ArgCollector struct {
+  Args []IObj
+  at byte
+  seqAt byte
+}
+
+func (ac *ArgCollector) Collect(arg IObj) error {
+  if ac.at < ac.seqAt {
+    ac.Args[ac.at] = arg
+    ac.at++
+  } else if ac.at == ac.seqAt {
+    ac.Args[ac.at] = vec.EmptyVector{}.Conj(arg)
+    ac.at++
+  } else if ac.seqAt != 0 {
+    ac.Args[ac.at - 1] = ac.Args[ac.at - 1].Conj(arg)
+  } else {
+    return errors.New("ArityExceptionBlah")
+  }
+  return nil
+}
+
 func (s *stackFrame) Error () string {
   return "oops at " + s.fnName
 }
-
-type callable func (callStack *stackFrame, args ISeq) (IObj, error)
 
 type RETURN struct {}
 type PUSH struct {
   val IObj
 }
+type PUSHARG struct{}
 type POP struct {}
 type DO struct {}
 type UNDO struct {}
 type CALL struct {
   sf *stackFrame
-  fn *callable
 }
 type CJUMP struct {
   to int
@@ -57,7 +78,7 @@ type THROW struct {
 const FALSE primitives.Bool = primitives.Bool(false)
 
 
-func interpreter (instrs []interface{}) callable {
+func interpreter (instrs []interface{}) func (*stackFrame, ISeq) (IObj, error) {
   return func (callStack *stackFrame, args ISeq) (IObj, error) {
     instructions := instrs
     PC := 0
@@ -102,7 +123,7 @@ func interpreter (instrs []interface{}) callable {
   }
 }
 
-var plus = callable(func (callStack *stackFrame, args ISeq) (IObj, error) {
+var plus = func (callStack *stackFrame, args ISeq) (IObj, error) {
   var result INumeric = primitives.Long(0)
   for args.Seq() != nil {
     x, ok := args.First().(INumeric)
@@ -114,12 +135,12 @@ var plus = callable(func (callStack *stackFrame, args ISeq) (IObj, error) {
     args = args.Rest()
   }
   return result.(IObj), nil
-})
+}
 
-var print = callable(func (callStack *stackFrame, args ISeq) (IObj, error) {
+var print = func (callStack *stackFrame, args ISeq) (IObj, error) {
   fmt.Println(args)
   return nil, nil
-})
+}
 
 // func interpreter (instructions []byte, operands [][]IObj) callable {
 //   return func (callStack *stackFrame, ISeq args) (IObj, error) {
