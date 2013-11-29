@@ -3,13 +3,6 @@ package exec3
 // import . "clojang/data/interfaces"
 import "fmt"
 
-type stackFrame struct {
-  catches []int
-  memory []int
-  callsite [][]int
-  name string
-}
-
 const (
   ADD uint32 = iota // r1, r2, r3 :: r1 = r2 + r3
   SUB             // r1, r2, r3 :: r1 = r2 - r3
@@ -27,23 +20,21 @@ const (
   END
 )
 
-func interpret (start *stackFrame, instructions []uint32) {
-  var stack [2048]stackFrame
+func interpret (instructions []uint32) {
   var reg [256]int32
   var r1 uint32
   var r2 uint32
   var r3 uint32
   var offset uint32
-  
+
   var PC uint32
   var currentInstruction uint32
   // var SP uint16
 
-  stack[0] = *start;
 
   defer func() {
         if r := recover(); r != nil {
-            fmt.Println("program exit", r)
+            fmt.Println("program exit")
         }
   }()
 
@@ -156,8 +147,7 @@ func interpret (start *stackFrame, instructions []uint32) {
   }
 }
 
-func interpret2 (start *stackFrame, instructions []uint32) {
-  var stack [2048]stackFrame
+func interpret2 (instructions []uint32) {
   var reg [256]int32
   var r1 uint32
   var r2 uint32
@@ -169,7 +159,6 @@ func interpret2 (start *stackFrame, instructions []uint32) {
   var currentInstruction uint32
   // var SP uint16
 
-  stack[0] = *start;
 
 
   for {
@@ -279,24 +268,17 @@ func interpret2 (start *stackFrame, instructions []uint32) {
   }
 }
 
-
-var exemplar []uint32 = []uint32 {
-  LOAD16 ^ 0x00000100 ^ 0x000F0000, // put the number 16 in reg[1]
-  LOAD32 ^ 0x00000000,
-  48,                               // put the number 48 in reg[0]
-  ADD ^ 0x00010200,                  // r[2] = r[1] + r[0]
-  PRINT ^ 0x00000200,                // print r[2]
-  END,
-}
-
-var exemplar2 []uint32 = []uint32 {
-  LOAD16 ^ 0x00010500,
+// this program sums the natural numbers to ten million (without catching overflow)
+var exampleProgram []uint32 = []uint32 {
+  LOAD16 ^ 0x00010500,          // r[5] = 1
   LOAD32 ^ 0x00000100,
-  5000000,                               // put the number 5000 in reg[1]
+  10000000,                               // put the number 5000 in reg[1]
   JMPFEQ ^ 0x04000100,              // jump forward somewhere if reg[1] == reg[0]
   ADD ^ 0x02010200,                  // r[2] = r[1] + r[2]
-  SUB ^ 0x05010100,                  // r[1]--
+  SUB ^ 0x05010100,                  // r[1]-=r[5]
   JMPB ^ 0x00000300,
   PRINT ^ 0x00000200,                // print r[2]
   END,
 }
+
+
